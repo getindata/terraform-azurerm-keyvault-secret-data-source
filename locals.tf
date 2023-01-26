@@ -11,21 +11,13 @@ locals {
     }
   ]...)
 
-  key_vaults = [
+  key_vaults = merge([
     for secret in local.secrets : {
       (secret.key_vault) : {
-        key_vault_id : secret.key_vault_id
         secrets : {
-          (secret.name) : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].value
+          (secret.name) : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"]
         }
       }
     } if local.enabled
-  ]
-}
-
-module "deepmerge" {
-  source  = "Invicton-Labs/deepmerge/null"
-  version = "0.1.5"
-
-  maps = local.key_vaults
+  ]...)
 }

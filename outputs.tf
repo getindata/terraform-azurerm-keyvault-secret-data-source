@@ -1,5 +1,5 @@
 output "key_vaults" {
   description = "Key vaults with retrieved objects"
-  value       = module.deepmerge.merged
+  value       = local.key_vaults
   sensitive   = true
 }
