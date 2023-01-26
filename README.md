@@ -83,7 +83,6 @@ you don't have to write Terraform code again but only use this module and connec
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_deepmerge"></a> [deepmerge](#module\_deepmerge) | Invicton-Labs/deepmerge/null | 0.1.5 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 
 ## Outputs
