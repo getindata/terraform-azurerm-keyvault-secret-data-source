@@ -7,6 +7,7 @@ output "key_vaults" {
 output "key_vault_a" {
   description = "Objects retrieved from key-vault-a"
   value       = module.key_vault_secret_data_source.key_vaults.key-vault-a
+  sensitive   = true
 }
 
 output "key_vault_a_secrets" {
