@@ -1,11 +1,19 @@
 # Simple Example
 
 ```terraform
-module "terraform_module_template" {
+module "key_vault_data_source" {
   source = "../../"
 
-  location            = var.location
-  resource_group_name = var.resource_group_name
+  key_vaults = {
+    key-vault-a: {
+      key_vault_id: "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT_A_NAME>"
+      secrets: ["SECRET_1", "SECRET_2"]
+    }
+    key-vault-b: {
+      key_vault_id: "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT_B_NAME>"
+      secrets: ["SECRET_3"]
+    }
+  }
 }
 ```
 
@@ -13,6 +21,6 @@ module "terraform_module_template" {
 
 ```
 terraform init
-terraform plan -var-file fixtures.west-europe.tfvars -out tf.plan
-terraform apply tf.plan
+terraform plan -out tfplan
+terraform apply tfplan
 ```

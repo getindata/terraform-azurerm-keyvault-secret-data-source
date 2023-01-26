@@ -1,10 +1,31 @@
 locals {
-  # Get a name from the descriptor. If not available, use default naming convention.
-  # Trim and replace function are used to avoid bare delimiters on both ends of the name and situation of adjacent delimiters.
-  name_from_descriptor = module.this.enabled ? trim(replace(
-    lookup(module.this.descriptors, var.descriptor_name, module.this.id), "/${module.this.delimiter}${module.this.delimiter}+/", module.this.delimiter
-  ), module.this.delimiter) : null
+  enabled = module.this.enabled
 
-  location            = coalesce(one(data.azurerm_resource_group.this[*].location), var.location)
-  resource_group_name = coalesce(one(data.azurerm_resource_group.this[*].name), var.resource_group_name)
+  secrets = merge([
+    for key_vault, config in var.key_vaults : {
+      for name in config.secrets : "${key_vault}/${name}" => {
+        key_vault : key_vault
+        key_vault_id : config.key_vault_id
+        name : name
+      }
+    }
+  ]...)
+
+  key_vaults = [
+    for secret in local.secrets : {
+      (secret.key_vault) : {
+        key_vault_id : secret.key_vault_id
+        secrets : {
+          (secret.name) : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].value
+        }
+      }
+    } if local.enabled
+  ]
+}
+
+module "deepmerge" {
+  source  = "Invicton-Labs/deepmerge/null"
+  version = "0.1.5"
+
+  maps = local.key_vaults
 }

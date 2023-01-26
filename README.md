@@ -1,15 +1,10 @@
-# Terraform Azure Module Template
-
-
-> **Warning**:
-> This is a template document. Remember to **remove** all text in _italics_ and **update** Module name, Repo name and links/badges to the acual name of your GitHub repository/module!!!
+# Azure Key Vault Secret Data Source Module
 
 ![Azure](https://img.shields.io/badge/azure-%230072C6.svg?style=for-the-badge&logo=microsoftazure&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
 
-<!--- Replace repository name -->
-![License](https://badgen.net/github/license/getindata/terraform-azurerm-module-tempate/)
-![Release](https://badgen.net/github/release/getindata/terraform-azurerm-module-tempate/)
+![License](https://badgen.net/github/license/getindata/terraform-azurerm-keyvault-secret-data-source/)
+![Release](https://badgen.net/github/release/getindata/terraform-azurerm-keyvault-secret-data-source/)
 
 <p align="center">
   <img height="150" src="https://getindata.com/img/logo.svg">
@@ -18,32 +13,42 @@
 
 ---
 
-_Brief Description of MODULE:_
+Terraform module for retrieving objects from Azure Key Vault.
 
-* _What it does_
-* _What technologies it uses_
+* Can retrieve multiple secrets from multiple key vaults
 
 ## USAGE
 
-_Example usage of the module - terraform code snippet_
-
 ```terraform
-module "template" {
-  source = "github.com/getindata/terraform-azurerm-module-tempate"
+module "key_vault_data_source" {
+  source = "github.com/getindata/terraform-azurerm-keyvault-secret-data-source"
 
-  location            = "West Europe"
-  resource_group_name = "example-rg"
+  key_vaults = {
+    key-vault-a: {
+      key_vault_id: "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT_A_NAME>"
+      secrets: ["SECRET_1", "SECRET_2"]
+    }
+    key-vault-b: {
+      key_vault_id: "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.KeyVault/vaults/<KEY_VAULT_B_NAME>"
+      secrets: ["SECRET_3"]
+    }
+  }
 }
 ```
 
 ## NOTES
 
-_Additional information that should be made public, for ex. how to solve known issues, additional descriptions/suggestions_
+This module was created to encapsulate logic of retrieving multiple secrets from Azure Key Vault. It also plays
+very well with Terragrunt setup when you have to provide secrets as arguments to different modules. In these scenarios 
+you don't have to write Terraform code again but only use this module and connect through dependencies to other modules. 
+
+> :warning: All objects retrieved with this module will be stored in the Terraform state as plain-text. 
+> Make sure to keep the state secure!
+
 
 ## EXAMPLES
 
 - [Simple](examples/simple)
-- [Complete](examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -125,9 +130,8 @@ Apache 2 Licensed. See [LICENSE](LICENSE) for full details.
 
 ## AUTHORS
 
-<!--- Replace repository name -->
-<a href="https://github.com/getindata/terraform-azurerm-module-tempate/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=getindata/terraform-azurerm-module-tempate" />
+<a href="https://github.com/getindata/terraform-azurerm-keyvault-secret-data-source/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=getindata/terraform-azurerm-keyvault-secret-data-source" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
