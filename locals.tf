@@ -1,10 +1,31 @@
 locals {
-  # Get a name from the descriptor. If not available, use default naming convention.
-  # Trim and replace function are used to avoid bare delimiters on both ends of the name and situation of adjacent delimiters.
-  name_from_descriptor = module.this.enabled ? trim(replace(
-    lookup(module.this.descriptors, var.descriptor_name, module.this.id), "/${module.this.delimiter}${module.this.delimiter}+/", module.this.delimiter
-  ), module.this.delimiter) : null
+  enabled = module.this.enabled
 
-  location            = coalesce(one(data.azurerm_resource_group.this[*].location), var.location)
-  resource_group_name = coalesce(one(data.azurerm_resource_group.this[*].name), var.resource_group_name)
+  secrets = merge([
+    for key_vault, config in var.key_vaults : {
+      for name in config.secrets : "${key_vault}/${name}" => {
+        key_vault : key_vault
+        key_vault_id : config.key_vault_id
+        name : name
+      }
+    }
+  ]...)
+
+  key_vaults = merge([
+    for secret in local.secrets : {
+      (secret.key_vault) : {
+        secrets : {
+          (secret.name) : {
+            id : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].id
+            name : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].name
+            key_vault_id : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].key_vault_id
+            value : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].value
+            version : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].version
+            content_type : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].content_type
+            tags : data.azurerm_key_vault_secret.this["${secret.key_vault}/${secret.name}"].tags
+          }
+        }
+      }
+    } if local.enabled
+  ]...)
 }
