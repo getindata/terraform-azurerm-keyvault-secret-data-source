@@ -4,7 +4,6 @@ repos:
     hooks:
       - id: terraform-validate # It should be before tflint hook as it runs terraform init required by tflint
       - id: terraform-fmt
-      - id: terragrunt-hclfmt
       - id: tflint
         args:
           - --module
